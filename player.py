@@ -7,11 +7,14 @@ from shot import Shot
 class Player(CircleShape):
     def __init__(self, x, y):
         super().__init__(x, y, PLAYER_RADIUS)
-        self.rotation = 0
+        self.rotation = 180
         self.shoot_timer = 0
+        self.shield = 0
+        self.buff = None
+        self.buff_timer = 0
 
     def draw(self, screen):
-        pygame.draw.polygon(screen, "white", self.triangle(), 2)
+        pygame.draw.polygon(screen, self.color, self.triangle(), 2)
 
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
@@ -22,7 +25,14 @@ class Player(CircleShape):
         return [a, b, c]
 
     def update(self, dt):
-        self.shoot_timer -= dt
+        if self.shoot_timer > 0:
+            self.shoot_timer -= dt
+        if self.buff_timer <= 0:
+            self.buff = None
+        else:
+            print(self.buff)
+            print(self.buff_timer)
+            self.buff_timer -= dt
         keys = pygame.key.get_pressed()
         if keys[pygame.K_w]:
             self.move(dt)
@@ -45,7 +55,19 @@ class Player(CircleShape):
     def shoot(self):
         if self.shoot_timer > 0:
             return
-        shot = Shot(self.position.x, self.position.y)
-        shot.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
-        self.shoot_timer = PLAYER_SHOOT_COOLDOWN
+        if self.buff == "power":
+            color = "red"
+        elif self.buff == "speed":
+            color = "yellow"
+        else:
+            color = "white"
+        shot = Shot(self.position.x, self.position.y, color)
+        if self.buff == "speed":
+            shot.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * PLAYER_SHOOT_SPEED * 1.2
+        else:
+            shot.velocity = pygame.Vector2(0, 1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
+        if self.buff == "speed":
+            self.shoot_timer = PLAYER_SHOOT_COOLDOWN / 2
+        else:
+            self.shoot_timer = PLAYER_SHOOT_COOLDOWN
 

@@ -2,6 +2,7 @@ import pygame
 import random
 from constants import *
 from circleshape import CircleShape
+from buff import *
 
 class Asteroid(CircleShape):
     def __init__(self, x, y, radius):
@@ -23,3 +24,5 @@ class Asteroid(CircleShape):
         ast2 = Asteroid(self.position.x, self.position.y, new_radius)
         ast1.velocity = self.velocity.rotate(angle) * 1.2
         ast2.velocity = self.velocity.rotate(-angle) * 1.2
+
+            
